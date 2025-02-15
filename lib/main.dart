@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'otp_screen.dart'; // Import the OTP screen
+import 'authentication/otp_screen.dart'; // Import the OTP screen
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void>  main() async{
+  
    WidgetsFlutterBinding.ensureInitialized();
+   await dotenv.load(fileName: "assets/.env"); 
    Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

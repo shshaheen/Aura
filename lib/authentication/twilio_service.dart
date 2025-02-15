@@ -1,11 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class TwilioService {
-  static const String accountSID = "AC9493f722fb5d31604e8adab19e8d514a"; // Twilio Account SID
-  static const String authToken = "99318960dc7de2dac9d2655f69924fde"; // Twilio Auth Token
+  static String accountSID = dotenv.env['ACCOUNT_SID'] ?? ''; // Twilio Account SID
+  static String authToken = dotenv.env['AUTH_TOKEN'] ?? ''; // Twilio Auth Token
   // static const String twilioNumber = ""; // Twilio Phone Number
-  static const String twilioVerifySID = "VAd36eee7d794a2082770e6ef971628787"; // Twilio Verify Service SID
+  static String twilioVerifySID = dotenv.env['TWILIO_VERIFY_SID'] ?? ''; // Twilio Verify Service SID
 
   static Future<bool> sendOTP(String phoneNumber) async {
     final Uri uri = Uri.parse(
