@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:aura/screens/profile_screen.dart';
 class TwilioService {
   static String accountSID =
       dotenv.env['ACCOUNT_SID'] ?? ''; // Twilio Account SID
@@ -62,7 +62,7 @@ class TwilioService {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Homepage(),
+          builder: (context) => CompleteProfileScreen(),
         ),
       );
       return true;
