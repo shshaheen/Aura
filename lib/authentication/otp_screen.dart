@@ -1,14 +1,16 @@
 import 'dart:async';
-import 'dart:math';
+// import 'dart:math';
 import 'package:flutter/material.dart';
 import 'twilio_service.dart';
 
 class OTPScreen extends StatefulWidget {
+  const OTPScreen({super.key});
   @override
-  _OTPScreenState createState() => _OTPScreenState();
+  OTPScreenState createState() => OTPScreenState();
 }
 
-class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMixin {
+class OTPScreenState extends State<OTPScreen>
+    with SingleTickerProviderStateMixin {
   TextEditingController phoneController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   bool otpSent = false;
@@ -23,7 +25,9 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: Duration(seconds: 3))..repeat(reverse: true);
+    _controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 3))
+          ..repeat(reverse: true);
 
     _borderAnimation = _controller.drive(ColorTween(
       begin: Colors.blueAccent,
@@ -59,7 +63,8 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
     });
 
     String phoneNumber = "+91${phoneController.text.trim()}";
-    if (phoneController.text.trim().isEmpty || phoneController.text.length != 10) {
+    if (phoneController.text.trim().isEmpty ||
+        phoneController.text.length != 10) {
       setState(() {
         errorMessage = "Enter a valid 10-digit phone number";
         isLoading = false;
@@ -153,7 +158,8 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
               child: Card(
                 color: Colors.black, // Inner card also black
                 elevation: 10,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
                 child: Padding(
                   padding: const EdgeInsets.all(25.0),
                   child: Column(
@@ -161,7 +167,10 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                     children: [
                       Text(
                         "OTP Authentication",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                       SizedBox(height: 15),
 
@@ -173,8 +182,10 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                           labelText: "Phone Number",
                           labelStyle: TextStyle(color: Colors.grey),
                           prefixText: "+91 ",
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          prefixIcon: Icon(Icons.phone, color: Colors.blueAccent),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          prefixIcon:
+                              Icon(Icons.phone, color: Colors.blueAccent),
                         ),
                         keyboardType: TextInputType.phone,
                         enabled: !otpSent,
@@ -191,8 +202,10 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                               decoration: InputDecoration(
                                 labelText: "Enter OTP",
                                 labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                                prefixIcon: Icon(Icons.lock, color: Colors.blueAccent),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                prefixIcon:
+                                    Icon(Icons.lock, color: Colors.blueAccent),
                               ),
                               keyboardType: TextInputType.number,
                             ),
@@ -209,7 +222,10 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                       if (errorMessage.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: Text(errorMessage, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                          child: Text(errorMessage,
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold)),
                         ),
 
                       /// OTP Actions
@@ -221,8 +237,10 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blueAccent,
                                 foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 25),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 25),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
                               ),
                             ),
                       SizedBox(height: 10),
