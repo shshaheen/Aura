@@ -121,6 +121,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // Fixes keyboard pushing UI
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -136,117 +137,119 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       ),
       backgroundColor: Colors.pink[50],
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
+        child: SingleChildScrollView( // Fix for overflow issue
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
 
-              // Profile Picture Upload
-              Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: _image != null ? FileImage(_image!) : null,
-                    child: _image == null
-                        ? const Icon(Icons.camera_alt, color: Colors.white, size: 30)
-                        : null,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Name Input Field
-              const Text(
-                "Name",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 5),
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  hintText: "Enter your name",
-                  labelText: "Name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                keyboardType: TextInputType.name,
-              ),
-              const SizedBox(height: 20),
-
-              // Gender Selection
-              const Text(
-                "Gender",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              Row(
-                children: [
-                  Radio(
-                    value: "Female",
-                    groupValue: _gender,
-                    onChanged: (value) {
-                      setState(() {
-                        _gender = value.toString();
-                      });
-                    },
-                    activeColor: Colors.pink,
-                  ),
-                  const Text("Female"),
-                  Radio(
-                    value: "Male",
-                    groupValue: _gender,
-                    onChanged: (value) {
-                      setState(() {
-                        _gender = value.toString();
-                      });
-                    },
-                    activeColor: Colors.pink,
-                  ),
-                  const Text("Male"),
-                  Radio(
-                    value: "Other",
-                    groupValue: _gender,
-                    onChanged: (value) {
-                      setState(() {
-                        _gender = value.toString();
-                      });
-                    },
-                    activeColor: Colors.pink,
-                  ),
-                  const Text("Other"),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Submit Button
-              Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isUploading ? null : _saveProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                // Profile Picture Upload
+                Center(
+                  child: GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: _image != null ? FileImage(_image!) : null,
+                      child: _image == null
+                          ? const Icon(Icons.camera_alt, color: Colors.white, size: 30)
+                          : null,
                     ),
-                    child: _isUploading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Submit",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+
+                // Name Input Field
+                const Text(
+                  "Name",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 5),
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    hintText: "Enter your name",
+                    labelText: "Name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  keyboardType: TextInputType.name,
+                ),
+                const SizedBox(height: 20),
+
+                // Gender Selection
+                const Text(
+                  "Gender",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                Row(
+                  children: [
+                    Radio(
+                      value: "Female",
+                      groupValue: _gender,
+                      onChanged: (value) {
+                        setState(() {
+                          _gender = value.toString();
+                        });
+                      },
+                      activeColor: Colors.pink,
+                    ),
+                    const Text("Female"),
+                    Radio(
+                      value: "Male",
+                      groupValue: _gender,
+                      onChanged: (value) {
+                        setState(() {
+                          _gender = value.toString();
+                        });
+                      },
+                      activeColor: Colors.pink,
+                    ),
+                    const Text("Male"),
+                    Radio(
+                      value: "Other",
+                      groupValue: _gender,
+                      onChanged: (value) {
+                        setState(() {
+                          _gender = value.toString();
+                        });
+                      },
+                      activeColor: Colors.pink,
+                    ),
+                    const Text("Other"),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Submit Button
+                Center(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isUploading ? null : _saveProfile,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: _isUploading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              "Submit",
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

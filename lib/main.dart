@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: CompleteProfileScreen(), // Start with OTP Screen
+      home: OTPScreen(), // Start with OTP Screen
     );
   }
 }
