@@ -1,4 +1,9 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart'; 
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:aura/widgets/homepage.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -10,12 +15,107 @@ class CompleteProfileScreen extends StatefulWidget {
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
-  String _gender = "Female"; // Default gender selection
+  String _gender = "Female"; 
+  File? _image;
+  bool _isUploading = false;
+  final ImagePicker _picker = ImagePicker();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String _userId = const Uuid().v4(); 
+
+  // Cloudinary instance
+  final cloudinary = CloudinaryPublic('dykk3ngmx', 'flutter_upload', cache: false);
 
   @override
   void dispose() {
-    _nameController.dispose(); // Avoid memory leaks
+    _nameController.dispose();
     super.dispose();
+  }
+
+  // Function to pick an image
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  // Function to upload image to Cloudinary
+  Future<String?> _uploadImage() async {
+    if (_image == null) return null;
+    try {
+      setState(() {
+        _isUploading = true;
+      });
+
+      CloudinaryResponse response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(_image!.path, resourceType: CloudinaryResourceType.Image),
+      );
+
+      return response.secureUrl; // Returns the uploaded image URL
+    } catch (e) {
+      print("Image upload error: $e");
+      return null;
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
+  }
+
+  // Function to save profile details to Firestore
+  Future<void> _saveProfile() async {
+    if (_nameController.text.isEmpty || _image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter your name and select an image"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    String? imageUrl = await _uploadImage();
+    if (imageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to upload image"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _firestore.collection("users").doc(_userId).set({
+        "userId": _userId,
+        "name": _nameController.text.trim(),
+        "gender": _gender,
+        "imageUrl": imageUrl, // Storing Cloudinary image URL in Firestore
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Profile saved successfully!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Homepage()),
+      );
+    } catch (e) {
+      print("Firestore error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to save profile"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -43,11 +143,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             children: [
               const SizedBox(height: 20),
 
-              // Profile Picture
+              // Profile Picture Upload
               Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/images/profile.jpg'),
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: _image != null ? FileImage(_image!) : null,
+                    child: _image == null
+                        ? const Icon(Icons.camera_alt, color: Colors.white, size: 30)
+                        : null,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -63,22 +170,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 decoration: InputDecoration(
                   hintText: "Enter your name",
                   labelText: "Name",
-                  labelStyle: const TextStyle(color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.pink),
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 ),
                 keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.done,
               ),
               const SizedBox(height: 20),
 
@@ -131,26 +229,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      FocusScope.of(context)
-                          .unfocus(); // Ensure input is unfocused
-
-                      if (_nameController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Please enter your name"),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return; // Stop further execution if name is empty
-                      }
-
-                      // Navigate to HomePage after form validation
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => Homepage()),
-                      );
-                    },
+                    onPressed: _isUploading ? null : _saveProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple,
                       padding: const EdgeInsets.symmetric(vertical: 15),
@@ -158,10 +237,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text(
-                      "Submit",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
+                    child: _isUploading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "Submit",
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
                   ),
                 ),
               ),
