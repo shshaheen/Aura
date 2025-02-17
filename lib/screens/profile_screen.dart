@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:sample/home_page.dart';
+import 'package:aura/widgets/homepage.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -132,7 +132,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      FocusScope.of(context).unfocus(); // Ensure input is unfocused
+                      FocusScope.of(context)
+                          .unfocus(); // Ensure input is unfocused
 
                       if (_nameController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -145,10 +146,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       }
 
                       // Navigate to HomePage after form validation
-                      // Navigator.pushReplacement(
-                      //   context,
-                        // MaterialPageRoute(builder: (context) => HomePage()),
-                      // );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Homepage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple,
