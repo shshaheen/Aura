@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:aura/main.dart'; // Import to access kLightColorScheme and kDarkColorScheme
 
-class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
+class AboutsScreen1 extends StatelessWidget {
+  const AboutsScreen1({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +84,7 @@ class AboutScreen extends StatelessWidget {
                   // Indicator Dots
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(4, (index) {
+                    children: List.generate(3, (index) {
                       return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         width: index == 0 ? 14 : 10,

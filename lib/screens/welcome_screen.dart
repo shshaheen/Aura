@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aura/main.dart'; // Ensure you import kColorScheme and kDarkColorScheme
-import 'abouts_screen.dart';
+import 'Abouts/abouts.dart';
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -55,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                 // Navigate to OTP Screen or Next Page
                  Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AboutScreen()),
+                  MaterialPageRoute(builder: (context) => const AboutsMain()),
                 );
               },
               style: ElevatedButton.styleFrom(
