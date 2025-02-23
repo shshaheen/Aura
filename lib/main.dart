@@ -1,10 +1,10 @@
+import 'package:aura/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
-import 'authentication/otp_screen.dart'; // Import the OTP screen
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:aura/screens/profile_screen.dart';
+// import 'package:aura/screens/profile_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: OTPScreen(), // Start with OTP Screen
+      home: WelcomeScreen(), // Start with OTP Screen
     );
   }
 }
