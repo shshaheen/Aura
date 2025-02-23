@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
-// import 'authentication/otp_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final buttonTheme = Theme.of(context).elevatedButtonTheme.style;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFE0F7FA), Color(0xFFB2EBF2)],
+            colors: [
+              colorScheme.primaryContainer.withOpacity(0.3),
+              colorScheme.primaryContainer.withOpacity(0.6),
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -21,54 +27,53 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             // Logo
             Image.asset(
-              'assets/images/aura_logo.png', // Replace with your actual logo asset
-              height:250,
+              'assets/images/aura_logo.png', // Ensure the asset exists
+              height: 250,
             ),
-            // SizedBox(height: 10,),
+
             // App Name
-            const Text(
+            Text(
               'AURA',
-              style: TextStyle(
+              style: textTheme.titleLarge?.copyWith(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF00838F),
-                fontFamily: 'Poppins', // Use a custom font
+                color: const Color.fromARGB(255, 0, 52, 121)
               ),
             ),
 
             const SizedBox(height: 120),
-            
-            // Get Started Button
+
+            // Get Started Button (Uses Theme's ElevatedButton Style)
             ElevatedButton(
-            onPressed: () {
-              
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4DD0E1),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              elevation: 5,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.arrow_right_alt, color: Colors.white, size: 30),
-                 const SizedBox(width: 10),
-                const Text(
-                  "Let's Get Started",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+              onPressed: () {
+                // Navigate to OTP Screen or Next Page
+              },
+              style: buttonTheme?.copyWith(
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                // Space between text and icon
-                
-              ],
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                ),
+                elevation: MaterialStateProperty.all(5),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.arrow_right_alt, size: 30),
+                  const SizedBox(width: 10),
+                  Text(
+                    "Let's Get Started",
+                    style: textTheme.titleMedium?.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           ],
         ),
       ),
