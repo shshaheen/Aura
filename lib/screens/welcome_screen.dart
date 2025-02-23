@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:aura/main.dart'; // Ensure you import kColorScheme and kDarkColorScheme
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final buttonTheme = Theme.of(context).elevatedButtonTheme.style;
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final isDarkMode = brightness == Brightness.dark;
+    
+    // Assign colors dynamically based on the theme mode
+    final backgroundColor = isDarkMode ? kDarkColorScheme.background : kLightColorScheme.background;
+    final textColor = isDarkMode ? kDarkColorScheme.onBackground : kLightColorScheme.onBackground;
+    final buttonColor = isDarkMode ? kDarkColorScheme.primary : kLightColorScheme.primary;
+    final buttonTextColor = isDarkMode ? kDarkColorScheme.onPrimary : kLightColorScheme.onPrimary;
+    final gradientStart = isDarkMode ? kDarkColorScheme.inversePrimary : kLightColorScheme.primaryContainer.withOpacity(0.3);
+    final gradientEnd = isDarkMode ? kDarkColorScheme.onSecondary : kLightColorScheme.primaryContainer.withOpacity(0.6);
 
     return Scaffold(
+      backgroundColor: backgroundColor, // Background color changes based on mode
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              colorScheme.primaryContainer.withOpacity(0.3),
-              colorScheme.primaryContainer.withOpacity(0.6),
-            ],
+            colors: [gradientStart, gradientEnd],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -27,37 +33,35 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             // Logo
             Image.asset(
-              'assets/images/aura_logo.png', // Ensure the asset exists
+              'assets/images/aura_logo.png',
               height: 250,
             ),
 
             // App Name
             Text(
               'AURA',
-              style: textTheme.titleLarge?.copyWith(
+              style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 0, 52, 121)
+                color: textColor, // Dynamically assigned text color
               ),
             ),
 
             const SizedBox(height: 120),
 
-            // Get Started Button (Uses Theme's ElevatedButton Style)
+            // Get Started Button
             ElevatedButton(
               onPressed: () {
                 // Navigate to OTP Screen or Next Page
               },
-              style: buttonTheme?.copyWith(
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: buttonColor, // Button color based on theme
+                foregroundColor: buttonTextColor, // Text color based on theme
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                padding: MaterialStateProperty.all(
-                  const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                ),
-                elevation: MaterialStateProperty.all(5),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                elevation: 5,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -66,9 +70,10 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Text(
                     "Let's Get Started",
-                    style: textTheme.titleMedium?.copyWith(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
+                      color: buttonTextColor, // Button text color changes dynamically
                     ),
                   ),
                 ],

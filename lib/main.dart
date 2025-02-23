@@ -4,20 +4,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-var kColorScheme = ColorScheme.fromSeed(
+// Light Mode Color Scheme
+var kLightColorScheme = ColorScheme.fromSeed(
   seedColor: const Color.fromARGB(255, 0, 194, 203),
 );
 
+// Dark Mode Color Scheme
 var kDarkColorScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
-  seedColor: const Color.fromARGB(255, 0, 130, 140), // A darker teal shade
+  seedColor: const Color.fromARGB(255, 0, 130, 140),
 );
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
-  await Firebase.initializeApp( // Ensure this is awaited
+  await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());
@@ -31,31 +32,25 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Twilio OTP Authentication",
-      
+      themeMode: ThemeMode.system, // Automatically switches between light and dark mode
+
       // Light Theme
       theme: ThemeData(
-        colorScheme: kColorScheme,
+        colorScheme: kLightColorScheme,
         appBarTheme: AppBarTheme(
-          backgroundColor: kColorScheme.primaryContainer, 
-          foregroundColor: kColorScheme.onPrimary,
+          backgroundColor: kLightColorScheme.primaryContainer,
+          foregroundColor: kLightColorScheme.onPrimary,
         ),
         cardTheme: CardTheme(
-          color: kColorScheme.secondaryContainer,
+          color: kLightColorScheme.secondaryContainer,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: kColorScheme.primaryContainer,
-            foregroundColor: kColorScheme.onPrimary,
+            backgroundColor: kLightColorScheme.primary,
+            foregroundColor: kLightColorScheme.onPrimary,
           ),
         ),
-        textTheme: ThemeData().textTheme.copyWith(
-              titleLarge: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: kColorScheme.onSecondaryContainer,
-                fontSize: 20,
-              ),
-            ),
       ),
 
       // Dark Theme
@@ -69,9 +64,10 @@ class MyApp extends StatelessWidget {
           color: kDarkColorScheme.secondaryContainer,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
+        
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: kDarkColorScheme.inversePrimary,
+            backgroundColor: kDarkColorScheme.primary,
             foregroundColor: kDarkColorScheme.onPrimary,
           ),
         ),
