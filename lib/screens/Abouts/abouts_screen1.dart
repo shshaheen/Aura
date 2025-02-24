@@ -44,7 +44,7 @@ class AboutsScreen1 extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Image.asset(
-                  'assets/images/abouts.png',
+                  'assets/images/about1.png',
                   fit: BoxFit.contain,
                 ),
               ),

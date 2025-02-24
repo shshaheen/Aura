@@ -30,7 +30,7 @@ class AboutsScreen2 extends StatelessWidget {
 
             // Title
             Text(
-              "Welcome",
+              "Share Location",
               style: textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.primary,
@@ -44,7 +44,7 @@ class AboutsScreen2 extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Image.asset(
-                  'assets/images/abouts.png',
+                  'assets/images/about2.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -71,7 +71,7 @@ class AboutsScreen2 extends StatelessWidget {
                 children: [
                   // Description
                   Text(
-                    "AURA is all about women's safety.\nThis app is designed to ensure your safety at all times. Stay positive with us!",
+                    "On emergency situation easily share your live location with your friends, family, and closed ones",
                     textAlign: TextAlign.center,
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w500,

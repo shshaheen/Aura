@@ -30,7 +30,7 @@ class AboutsScreen3 extends StatelessWidget {
 
             // Title
             Text(
-              "Welcome",
+              "Emergency Alert",
               style: textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.primary,
@@ -44,7 +44,7 @@ class AboutsScreen3 extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Image.asset(
-                  'assets/images/abouts.png',
+                  'assets/images/about3.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -71,7 +71,7 @@ class AboutsScreen3 extends StatelessWidget {
                 children: [
                   // Description
                   Text(
-                    "AURA is all about women's safety.\nThis app is designed to ensure your safety at all times. Stay positive with us!",
+                    "Emergency alert functionality can call and send SMS on saved contacts , if stuck in a panic situation",
                     textAlign: TextAlign.center,
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w500,
