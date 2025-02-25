@@ -5,6 +5,13 @@ class Homepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Homepage'),
+      ),
+      body: Center(
+        child: Text('Welcome to the Homepage!'),
+      ),
+    );
   }
 }

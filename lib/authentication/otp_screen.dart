@@ -238,7 +238,7 @@ class OTPScreenState extends State<OTPScreen>
                         ],
                       ),
                     SizedBox(height: 20),
-                  
+                   
                     /// Error Message
                     if (errorMessage.isNotEmpty)
                       Padding(

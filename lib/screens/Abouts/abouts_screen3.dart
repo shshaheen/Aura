@@ -1,4 +1,4 @@
-import 'package:aura/authentication/otp_screen.dart';
+import '../phone_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aura/main.dart'; // Import to access kLightColorScheme and kDarkColorScheme
 
@@ -114,7 +114,7 @@ class AboutsScreen3 extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => OTPScreen()),
+                          MaterialPageRoute(builder: (context) => PhoneScreen()),
                         );
                       },
                       child: Text('Next')),

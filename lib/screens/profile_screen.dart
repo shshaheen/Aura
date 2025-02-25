@@ -22,7 +22,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _userId = const Uuid().v4(); 
 
-  // Cloudinary instance
   final cloudinary = CloudinaryPublic('dykk3ngmx', 'flutter_upload', cache: false);
 
   @override
@@ -31,7 +30,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     super.dispose();
   }
 
-  // Function to pick an image
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -41,7 +39,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
-  // Function to upload image to Cloudinary
   Future<String?> _uploadImage() async {
     if (_image == null) return null;
     try {
@@ -53,7 +50,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         CloudinaryFile.fromFile(_image!.path, resourceType: CloudinaryResourceType.Image),
       );
 
-      return response.secureUrl; // Returns the uploaded image URL
+      return response.secureUrl;
     } catch (e) {
       print("Image upload error: $e");
       return null;
@@ -64,7 +61,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
-  // Function to save profile details to Firestore
   Future<void> _saveProfile() async {
     if (_nameController.text.isEmpty || _image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,7 +88,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         "userId": _userId,
         "name": _nameController.text.trim(),
         "gender": _gender,
-        "imageUrl": imageUrl, // Storing Cloudinary image URL in Firestore
+        "imageUrl": imageUrl,
         "createdAt": FieldValue.serverTimestamp(),
       });
 
@@ -120,139 +116,100 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Fixes keyboard pushing UI
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.colorScheme.background,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "I'M SAFE",
-          style: TextStyle(
-            color: Colors.pink,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.headlineSmall?.copyWith(color: theme.colorScheme.primary),
         ),
       ),
-      backgroundColor: Colors.pink[50],
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        child: SingleChildScrollView( // Fix for overflow issue
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-
-                // Profile Picture Upload
-                Center(
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: _image != null ? FileImage(_image!) : null,
-                      child: _image == null
-                          ? const Icon(Icons.camera_alt, color: Colors.white, size: 30)
-                          : null,
-                    ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Center(
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: theme.colorScheme.secondary.withOpacity(0.3),
+                    backgroundImage: _image != null ? FileImage(_image!) : null,
+                    child: _image == null
+                        ? Icon(Icons.camera_alt, color: theme.colorScheme.onSecondary, size: 30)
+                        : null,
                   ),
                 ),
-                const SizedBox(height: 20),
-
-                // Name Input Field
-                const Text(
-                  "Name",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 20),
+              Text("Name", style: theme.textTheme.bodyLarge),
+              const SizedBox(height: 5),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  hintText: "Enter your name",
+                  labelText: "Name",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: theme.colorScheme.surface,
                 ),
-                const SizedBox(height: 5),
-                TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    hintText: "Enter your name",
-                    labelText: "Name",
-                    border: OutlineInputBorder(
+              ),
+              const SizedBox(height: 20),
+              Text("Gender", style: theme.textTheme.bodyLarge),
+              Row(
+                children: [
+                  _buildRadio("Female"),
+                  _buildRadio("Male"),
+                  _buildRadio("Other"),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _isUploading ? null : _saveProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
                   ),
-                  keyboardType: TextInputType.name,
+                  child: _isUploading
+                      ? CircularProgressIndicator(color: theme.colorScheme.onPrimary)
+                      : Text("Submit", style: TextStyle(color: theme.colorScheme.onPrimary)),
                 ),
-                const SizedBox(height: 20),
-
-                // Gender Selection
-                const Text(
-                  "Gender",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                Row(
-                  children: [
-                    Radio(
-                      value: "Female",
-                      groupValue: _gender,
-                      onChanged: (value) {
-                        setState(() {
-                          _gender = value.toString();
-                        });
-                      },
-                      activeColor: Colors.pink,
-                    ),
-                    const Text("Female"),
-                    Radio(
-                      value: "Male",
-                      groupValue: _gender,
-                      onChanged: (value) {
-                        setState(() {
-                          _gender = value.toString();
-                        });
-                      },
-                      activeColor: Colors.pink,
-                    ),
-                    const Text("Male"),
-                    Radio(
-                      value: "Other",
-                      groupValue: _gender,
-                      onChanged: (value) {
-                        setState(() {
-                          _gender = value.toString();
-                        });
-                      },
-                      activeColor: Colors.pink,
-                    ),
-                    const Text("Other"),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Submit Button
-                Center(
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isUploading ? null : _saveProfile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: _isUploading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "Submit",
-                              style: TextStyle(color: Colors.white, fontSize: 16),
-                            ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRadio(String value) {
+    return Row(
+      children: [
+        Radio(
+          value: value,
+          groupValue: _gender,
+          onChanged: (val) {
+            setState(() {
+              _gender = val.toString();
+            });
+          },
+        ),
+        Text(value),
+      ],
     );
   }
 }
