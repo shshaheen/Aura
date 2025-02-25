@@ -2,7 +2,7 @@ import 'dart:async';
 // import 'dart:math';
 import 'package:flutter/material.dart';
 import 'twilio_service.dart';
-
+import 'package:aura/main.dart';
 class OTPScreen extends StatefulWidget {
   const OTPScreen({super.key});
   @override
@@ -20,20 +20,14 @@ class OTPScreenState extends State<OTPScreen>
   int otpTimeout = 60;
 
   late AnimationController _controller;
-  late Animation<Color?> _borderAnimation;
-
   @override
   void initState() {
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(seconds: 3))
           ..repeat(reverse: true);
-
-    _borderAnimation = _controller.drive(ColorTween(
-      begin: Colors.blueAccent,
-      end: Colors.purpleAccent,
-    ));
   }
+
 
   @override
   void dispose() {
@@ -133,138 +127,149 @@ class OTPScreenState extends State<OTPScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black, // Pure black background
-      body: Padding(
+    final brightness = Theme.of(context).brightness;
+    final isDarkMode = brightness == Brightness.dark;
+
+    final colorScheme = isDarkMode ? kDarkColorScheme : kLightColorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Scaffold(// Pure black background
+      body: Container(
+        
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              colorScheme.primaryContainer.withOpacity(0.3),
+              colorScheme.primaryContainer.withOpacity(0.6),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         padding: const EdgeInsets.all(28.0),
         child: Center(
-          child: AnimatedBuilder(
-            animation: _borderAnimation,
-            builder: (context, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: _borderAnimation.value!, // Animated border color
-                    width: 3,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _borderAnimation.value!.withAlpha(0.6.toInt()),
-                      blurRadius: 10,
-                      spreadRadius: 3,
-                    )
+          child: Container(
+            // decoration: BoxDecoration(
+            //   borderRadius: BorderRadius.circular(20),
+              
+            // ),
+            padding: EdgeInsets.all(3), // Border padding
+            child: Card(
+              color: colorScheme.primary, // Inner card also black
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              child: Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "OTP Authentication",
+                      style: textTheme.headlineSmall?.copyWith( 
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimary),
+                    ),
+                    SizedBox(height: 15),
+                  
+                    /// Phone Number Input
+                    TextField(
+                      controller: phoneController,
+                      style: TextStyle(color: colorScheme.onPrimary),
+                      cursorColor: colorScheme.onPrimary, 
+                      decoration: InputDecoration(
+                        labelText: "Phone Number",
+                        labelStyle: TextStyle(color: colorScheme.onPrimary),
+                        prefixText: "+91 ",
+                        prefixStyle: TextStyle(color: colorScheme.onPrimary), 
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: colorScheme.onPrimaryContainer), // Default border
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: colorScheme.onPrimary, width: 2, ), // Focused border
+                        ),
+                        prefixIcon: Icon(Icons.phone, color: colorScheme.onPrimary),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      enabled: !otpSent,
+                    ),
+
+                    SizedBox(height: 15),
+                  
+                    /// OTP Input (Shown after OTP is sent)
+                    if (otpSent)
+                      Column(
+                        children: [
+                          TextField(
+                              controller: otpController,
+                              style: TextStyle(color: colorScheme.onPrimary),
+                              cursorColor: colorScheme.onPrimary,
+                              decoration: InputDecoration(
+                                labelText: "Enter OTP",
+                                labelStyle: TextStyle(color: colorScheme.onPrimary),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: colorScheme.onPrimaryContainer),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: colorScheme.onPrimaryContainer, width: 1.5),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: colorScheme.onPrimary, width: 1.5),
+                                ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.grey, width: 1),
+                                ),
+                                prefixIcon: Icon(Icons.lock, color: colorScheme.onPrimary),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+
+                          SizedBox(height: 10),
+                          Text(
+                            "OTP Expires in: $otpTimeout sec",
+                            style: TextStyle(color: Colors.red, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    SizedBox(height: 20),
+                  
+                    /// Error Message
+                    if (errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Text(errorMessage,
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                  
+                    /// OTP Actions
+                    isLoading
+                        ? CircularProgressIndicator(color: Colors.blueAccent)
+                        : ElevatedButton(
+                            onPressed: otpSent ? verifyOTP : sendOTP,
+                            child: Text(otpSent ? "Verify OTP" : "Send OTP"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.onSecondary,
+                              foregroundColor: colorScheme.onSecondaryContainer,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 25),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                    SizedBox(height: 10),
+                  
                   ],
                 ),
-                padding: EdgeInsets.all(3), // Border padding
-                child: Card(
-                  color: Colors.black, // Inner card also black
-                  elevation: 10,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "OTP Authentication",
-                          style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        SizedBox(height: 15),
-        
-                        /// Phone Number Input
-                        TextField(
-                          controller: phoneController,
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: "Phone Number",
-                            labelStyle: TextStyle(color: Colors.grey),
-                            prefixText: "+91 ",
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            prefixIcon:
-                                Icon(Icons.phone, color: Colors.blueAccent),
-                          ),
-                          keyboardType: TextInputType.phone,
-                          enabled: !otpSent,
-                        ),
-                        SizedBox(height: 15),
-        
-                        /// OTP Input (Shown after OTP is sent)
-                        if (otpSent)
-                          Column(
-                            children: [
-                              TextField(
-                                controller: otpController,
-                                style: TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  labelText: "Enter OTP",
-                                  labelStyle: TextStyle(color: Colors.grey),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  prefixIcon:
-                                      Icon(Icons.lock, color: Colors.blueAccent),
-                                ),
-                                keyboardType: TextInputType.number,
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                "OTP Expires in: $otpTimeout sec",
-                                style: TextStyle(color: Colors.red, fontSize: 14),
-                              ),
-                            ],
-                          ),
-                        SizedBox(height: 20),
-        
-                        /// Error Message
-                        if (errorMessage.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(errorMessage,
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-        
-                        /// OTP Actions
-                        isLoading
-                            ? CircularProgressIndicator(color: Colors.blueAccent)
-                            : ElevatedButton(
-                                onPressed: otpSent ? verifyOTP : sendOTP,
-                                child: Text(otpSent ? "Verify OTP" : "Send OTP"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 12, horizontal: 25),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                ),
-                              ),
-                        SizedBox(height: 10),
-        
-                        /// Reset Button
-                        // OutlinedButton(
-                        //   onPressed: resetForm,
-                        //   child: Text("Reset"),
-                        //   style: OutlinedButton.styleFrom(
-                        //     foregroundColor: Colors.blueAccent,
-                        //     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        //     textStyle: TextStyle(fontSize: 14),
-                        //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        //     side: BorderSide(color: Colors.blueAccent),
-                        //   ),
-                        // ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),

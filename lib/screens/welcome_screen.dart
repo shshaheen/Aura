@@ -70,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.arrow_right_alt, size: 30),
+                  Icon(Icons.arrow_right_alt, size: 30,color: buttonTextColor),
                   const SizedBox(width: 10),
                   Text(
                     "Let's Get Started",

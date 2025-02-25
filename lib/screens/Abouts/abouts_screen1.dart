@@ -13,7 +13,7 @@ class AboutsScreen1 extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: Container(
+      body: Container( 
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [

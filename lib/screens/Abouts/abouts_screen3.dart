@@ -1,3 +1,4 @@
+import 'package:aura/authentication/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aura/main.dart'; // Import to access kLightColorScheme and kDarkColorScheme
 
@@ -92,7 +93,8 @@ class AboutsScreen3 extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: index == 2
                               ? colorScheme.primary
-                              : colorScheme.onSecondaryContainer.withOpacity(0.5),
+                              : colorScheme.onSecondaryContainer
+                                  .withOpacity(0.5),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -105,8 +107,19 @@ class AboutsScreen3 extends StatelessWidget {
                       );
                     }),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => OTPScreen()),
+                        );
+                      },
+                      child: Text('Next')),
 
-                  const SizedBox(height: 20),
+                  // const SizedBox(height: 20),
                 ],
               ),
             ),
