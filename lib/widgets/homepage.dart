@@ -76,6 +76,7 @@ class _HomepageState extends State<Homepage> {
           "https://www.google.com/maps?q=${position.latitude},${position.longitude}";
       isLoading = false;
     });
+    print("Location for $phoneNumber: $locationLink");
   }
 
   @override
