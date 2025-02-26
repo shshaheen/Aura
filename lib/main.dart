@@ -107,7 +107,7 @@ class AuthWrapper extends StatelessWidget {
       var doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       if (doc.exists) {
         var data = doc.data();
-        return data != null && data['name'] != null && data['imageUrl'] != null;
+        return data != null && data['profileCompleted'] == true;
       }
       return false;
     } catch (e) {
@@ -116,4 +116,3 @@ class AuthWrapper extends StatelessWidget {
     }
   }
 }
-

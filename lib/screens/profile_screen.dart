@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:aura/widgets/homepage.dart';
 
@@ -20,7 +20,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   bool _isUploading = false;
   final ImagePicker _picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _userId = const Uuid().v4(); 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final cloudinary = CloudinaryPublic('dykk3ngmx', 'flutter_upload', cache: false);
 
@@ -83,14 +83,26 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       return;
     }
 
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("User not authenticated"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     try {
-      await _firestore.collection("users").doc(_userId).set({
-        "userId": _userId,
+      await _firestore.collection("users").doc(userId).set({
+        "userId": userId,
         "name": _nameController.text.trim(),
         "gender": _gender,
         "imageUrl": imageUrl,
+        "profileCompleted": true, // Ensures user is marked as completed
         "createdAt": FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true)); // Merging to avoid overwriting
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

@@ -4,14 +4,15 @@ import 'package:aura/screens/profile_screen.dart';
 import 'package:aura/widgets/homepage.dart';
 
 class OTPScreen extends StatefulWidget {
+ 
   final String verificationId;
-  OTPScreen({required this.verificationId});
+  const OTPScreen({super.key, required this.verificationId});
 
   @override
-  _OTPScreenState createState() => _OTPScreenState();
+  OTPScreenState createState() => OTPScreenState();
 }
 
-class _OTPScreenState extends State<OTPScreen> {
+class OTPScreenState extends State<OTPScreen> {
   final TextEditingController otpController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading = false;
@@ -43,7 +44,8 @@ class _OTPScreenState extends State<OTPScreen> {
 
       if (userCredential.user != null) {
         // Check if user has completed profile (you can modify this logic)
-        bool hasCompletedProfile = false; // Change this logic as per your database
+        bool hasCompletedProfile =
+            false; // Change this logic as per your database
 
         Navigator.pushReplacement(
           context,
@@ -98,7 +100,6 @@ class _OTPScreenState extends State<OTPScreen> {
                     ),
                   ),
                   SizedBox(height: 15),
-                  
                   TextField(
                     controller: otpController,
                     style: TextStyle(color: colorScheme.onPrimary),
@@ -108,27 +109,29 @@ class _OTPScreenState extends State<OTPScreen> {
                       labelStyle: TextStyle(color: colorScheme.onPrimary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: colorScheme.onPrimaryContainer),
+                        borderSide:
+                            BorderSide(color: colorScheme.onPrimaryContainer),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: colorScheme.onPrimary, width: 2),
+                        borderSide:
+                            BorderSide(color: colorScheme.onPrimary, width: 2),
                       ),
-                      prefixIcon: Icon(Icons.lock, color: colorScheme.onPrimary),
+                      prefixIcon:
+                          Icon(Icons.lock, color: colorScheme.onPrimary),
                     ),
                     keyboardType: TextInputType.number,
                   ),
                   SizedBox(height: 15),
-                  
                   if (errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Text(
                         errorMessage,
-                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.red, fontWeight: FontWeight.bold),
                       ),
                     ),
-                  
                   isLoading
                       ? CircularProgressIndicator(color: Colors.blueAccent)
                       : ElevatedButton(
@@ -137,7 +140,8 @@ class _OTPScreenState extends State<OTPScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colorScheme.onSecondary,
                             foregroundColor: colorScheme.onSecondaryContainer,
-                            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 25),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 25),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
