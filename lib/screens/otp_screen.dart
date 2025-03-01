@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:aura/screens/profile_screen.dart';
-import 'package:aura/widgets/homepage.dart';
+import 'package:aura/screens/homepage.dart';
 
 class OTPScreen extends StatefulWidget {
  

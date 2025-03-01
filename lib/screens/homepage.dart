@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:aura/main.dart';
 import 'package:flutter_map/flutter_map.dart';
-// import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:aura/widgets/main_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -16,24 +14,14 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String phoneNumber = "Fetching...";
-  String? locationLink;
-  bool isLoading = false;
-   LatLng? _currentPosition;
+  LatLng? _currentPosition;
+  int selectedIndex = -1; // Track the selected icon index
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
   }
-
-  // void _getUserPhoneNumber() {
-  //   User? user = FirebaseAuth.instance.currentUser;
-  //   setState(() {
-  //     phoneNumber = user?.phoneNumber ?? "No phone number found";
-  //   });
-  // }
-
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -57,103 +45,61 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  // Future<void> _getCurrentLocation() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     _showSnackbar("Enable location services in settings.");
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //     return;
-  //   }
-
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       _showSnackbar("Location permission denied.");
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       return;
-  //     }
-  //   }
-
-  //   if (permission == LocationPermission.deniedForever) {
-  //     _showSnackbar("Location permission is permanently denied. Enable it in settings.");
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     // Get last known location (if available)
-  //     Position? lastPosition = await Geolocator.getLastKnownPosition();
-  //     if (lastPosition != null) {
-  //       setState(() {
-  //         locationLink = "https://www.google.com/maps?q=${lastPosition.latitude},${lastPosition.longitude}";
-  //       });
-  //     }
-
-  //     // Get fresh location (more accurate)
-  //     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-
-  //     setState(() {
-  //       locationLink = "https://www.google.com/maps?q=${position.latitude},${position.longitude}";
-  //       isLoading = false;
-  //     });
-
-  //     // print("Location for $phoneNumber: $locationLink");
-  //   } catch (e) {
-  //     _showSnackbar("Failed to get location. Please try again.");
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-
-  // void _showSnackbar(String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'AURA',
-          style: GoogleFonts.lato(fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.onPrimary.withOpacity(0.3),
+              Theme.of(context).colorScheme.onPrimary.withOpacity(0.6),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-        actions: [
-          InkWell(
-            onTap: () {
-              // print("Niya image clicked");
-            },
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/niya.jpg',
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
+        ),
+        child: AppBar(
+          title: Text(
+            'AURA',
+            style: GoogleFonts.lato(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          ),
+          backgroundColor: Colors.transparent, // Keep gradient visible
+          elevation: 0, // Removes shadow
+          iconTheme: IconThemeData( // Change menu icon color
+            color: Theme.of(context).colorScheme.secondary, 
+          ),
+          actions: [
+            InkWell(
+              onTap: () {
+                // Handle profile tap
+              },
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/niya.jpg',
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
+          ],
         ),
-        ],
       ),
+    ),
+
       drawer: MainDrawer(),
       body: Column(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 3),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -185,13 +131,6 @@ class _HomepageState extends State<Homepage> {
               ),
             ),
           ),
-          // Text(
-          //   "Share Location",
-          //   style: TextStyle(
-          //     fontWeight: FontWeight.bold,
-          //     color: Colors.black,
-          //   ),
-          // ),
           Expanded(
             child: _currentPosition == null
                 ? Center(child: CircularProgressIndicator())
@@ -219,11 +158,12 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
           ),
-          
+
+          // Bottom Navigation Bar
           Container(
             padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color:  Theme.of(context).colorScheme.secondaryContainer,
+              color: Theme.of(context).colorScheme.onPrimary,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -232,20 +172,8 @@ class _HomepageState extends State<Homepage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.location_on)),
-                    Text("Track Me"),
-                  ],
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(onPressed: () {}, icon: Icon(LucideIcons.users)),
-                    Text("Friends"),
-                  ],
-                ),
+                buildNavItem(0, Icons.location_on, "Track Me"),
+                buildNavItem(1, LucideIcons.users, "Friends"),
                 Container(
                   width: 75,
                   height: 75,
@@ -261,25 +189,70 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Handle SOS button click
+                    },
                     icon: Icon(Icons.sos, color: Colors.white),
                   ),
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.phone_callback)),
-                    Text("Fake Call"),
-                  ],
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(onPressed: () {}, icon: Icon(LucideIcons.contact)),
-                    Text("Helpline"),
-                  ],
-                ),
+                buildNavItem(2, Icons.phone_callback, "Fake Call"),
+                buildNavItem(3, LucideIcons.contact, "Helpline"),
               ],
+            ),
+          ),
+        ],
+    ),
+    );
+  }
+
+  /// Builds a navigation icon item with highlight effect
+  Widget buildNavItem(int index, IconData icon, String label) {
+    bool isSelected = selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+        });
+
+        // Implement navigation functionality here
+        switch (index) {
+          case 0:
+            print("Navigate to Track Me");
+            break;
+          case 1:
+            print("Navigate to Friends");
+            break;
+          case 2:
+            print("Navigate to Fake Call");
+            break;
+          case 3:
+            print("Navigate to Helpline");
+            break;
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon, 
+              color: isSelected ? 
+              Theme.of(context).colorScheme.onPrimary : 
+              Theme.of(context).colorScheme.secondary
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? 
+              Theme.of(context).colorScheme.tertiary : 
+              Theme.of(context).colorScheme.secondary
             ),
           ),
         ],
