@@ -45,6 +45,12 @@ dependencies:
   cloudinary_public: ^0.23.1
   geolocator: ^13.0.2
   geocoding: ^3.0.0
+  lucide_icons: ^0.257.0
+  location: ^8.0.0
+  flutter_map: ^8.1.0
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.1
+  flutter_map_cancellable_tile_provider: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +82,7 @@ flutter:
     - assets/images/about2.png
     - assets/images/about1.png
     - assets/images/about3.png
+    - assets/images/niya.jpg
 
 
   #   - images/a_dot_ham.jpeg

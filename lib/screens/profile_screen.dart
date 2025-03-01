@@ -136,7 +136,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          "I'M SAFE",
+          "AURA",
           style: theme.textTheme.headlineSmall?.copyWith(color: theme.colorScheme.primary),
         ),
       ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:aura/main.dart';
+import 'package:aura/widgets/main_drawer.dart';
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -10,7 +11,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String? phoneNumber;
+  String phoneNumber = "Fetching...";
   String? locationLink;
   bool isLoading = false;
 
@@ -24,7 +25,6 @@ class _HomepageState extends State<Homepage> {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
       phoneNumber = user?.phoneNumber ?? "No phone number found";
-      // phoneNumber = '+918179291362';
     });
   }
 
@@ -33,26 +33,21 @@ class _HomepageState extends State<Homepage> {
       isLoading = true;
     });
 
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      _showSnackbar("Enable location services in settings.");
       setState(() {
-        locationLink = "Location services are disabled.";
         isLoading = false;
       });
       return;
     }
 
-    // Check permission status
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        _showSnackbar("Location permission denied.");
         setState(() {
-          locationLink = "Location permission denied.";
           isLoading = false;
         });
         return;
@@ -60,57 +55,87 @@ class _HomepageState extends State<Homepage> {
     }
 
     if (permission == LocationPermission.deniedForever) {
+      _showSnackbar("Location permission is permanently denied. Enable it in settings.");
       setState(() {
-        locationLink = "Location permissions are permanently denied.";
         isLoading = false;
       });
       return;
     }
 
-    // Get current location
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    try {
+      // Get last known location (if available)
+      Position? lastPosition = await Geolocator.getLastKnownPosition();
+      if (lastPosition != null) {
+        setState(() {
+          locationLink = "https://www.google.com/maps?q=${lastPosition.latitude},${lastPosition.longitude}";
+        });
+      }
 
-    setState(() {
-      locationLink =
-          "https://www.google.com/maps?q=${position.latitude},${position.longitude}";
-      isLoading = false;
-    });
-    print("Location for $phoneNumber: $locationLink");
+      // Get fresh location (more accurate)
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+
+      setState(() {
+        locationLink = "https://www.google.com/maps?q=${position.latitude},${position.longitude}";
+        isLoading = false;
+      });
+
+      print("Location for $phoneNumber: $locationLink");
+    } catch (e) {
+      _showSnackbar("Failed to get location. Please try again.");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Homepage'),
-      ),
+      appBar: AppBar(title: const Text('Homepage')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Welcome to the Homepage!',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Logged-in Phone Number: $phoneNumber',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _getCurrentLocation,
-              child: const Text("Generate Location Link"),
-            ),
-            const SizedBox(height: 10),
-            if (isLoading) const CircularProgressIndicator(),
-            if (locationLink != null)
-              SelectableText(
-                "Location Link: $locationLink",
-                style: const TextStyle(fontSize: 16, color: Colors.blue),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Welcome!',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                'Logged-in Phone: $phoneNumber',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _getCurrentLocation,
+                icon: const Icon(Icons.location_on, color: Colors.white,),
+                label: const Text("Get Location"),
+              ),
+              ElevatedButton.icon(
+                onPressed: (){},
+                icon: const Icon(Icons.location_on, color: Colors.white,),
+                label: const Text("Fake Call"),
+              ),
+              const SizedBox(height: 10),
+              if (isLoading) const CircularProgressIndicator(),
+              if (locationLink != null)
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SelectableText(
+                    "Location: $locationLink",
+                    style: const TextStyle(fontSize: 16, color: Colors.blue),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
