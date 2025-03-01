@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: kLightColorScheme,
         appBarTheme: AppBarTheme(
-          backgroundColor: kLightColorScheme.primaryContainer,
+          backgroundColor: kLightColorScheme.inversePrimary,
           foregroundColor: kLightColorScheme.onPrimary,
         ),
         cardTheme: CardTheme(
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
         appBarTheme: AppBarTheme(
-          backgroundColor: kDarkColorScheme.primaryContainer,
+          backgroundColor: kDarkColorScheme.inversePrimary,
           foregroundColor: kDarkColorScheme.onPrimary,
         ),
         cardTheme: CardTheme(
