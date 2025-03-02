@@ -1,12 +1,14 @@
-import 'package:aura/widgets/fake_call.dart';
+import 'package:aura/screens/Tabs/fake_call_setup/fake_call_screen.dart';
+import 'package:aura/screens/Tabs/fake_call_setup/incoming_call_screen.dart';
+import 'package:aura/screens/Tabs/fake_call_setup/new_call.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:aura/widgets/main_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aura/widgets/track_me.dart';
+import 'package:aura/screens/Tabs/fake_call_setup/widget/edit_caller_details.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -59,7 +61,17 @@ class _HomepageState extends State<Homepage> {
           print("Navigate to Friends");
           break;
         case 2:
-          currentWidget = FakeCall();
+          currentWidget = FakeCallScreen(
+            callerDetailsWidget: CallerDetailsCard(
+              onEdit: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NewCallPage()), // Navigate to NewCallPage
+              );
+              },
+            ),
+          );
+          
           break;
         case 3:
           print("Navigate to Helpline");
@@ -70,7 +82,11 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if keyboard is open
+    bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true, // Prevents overflow
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Container(
@@ -124,48 +140,48 @@ class _HomepageState extends State<Homepage> {
           const SizedBox(height: 3),
           Expanded(child: currentWidget), // Now updates dynamically
 
-          // Bottom Navigation Bar
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onPrimary,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+          // Show Bottom Navigation only if keyboard is NOT open
+          if (!isKeyboardOpen)
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onPrimary,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  buildNavItem(0, Icons.location_on, "Track Me"),
+                  buildNavItem(1, LucideIcons.users, "Friends"),
+                  Container(
+                    width: 75,
+                    height: 75,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.withOpacity(0.5),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        // Handle SOS button click
+                      },
+                      icon: Icon(Icons.sos, color: Colors.white),
+                    ),
+                  ),
+                  buildNavItem(2, Icons.phone_callback, "Fake Call"),
+                  buildNavItem(3, LucideIcons.contact, "Helpline"),
+                ],
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                buildNavItem(0, Icons.location_on, "Track Me"),
-                buildNavItem(1, LucideIcons.users, "Friends"),
-                Container(
-                  width: 75,
-                  height: 75,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color.fromARGB(255, 127, 13, 13)
-                            .withOpacity(0.5),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      // Handle SOS button click
-                    },
-                    icon: Icon(Icons.sos, color: Colors.white),
-                  ),
-                ),
-                buildNavItem(2, Icons.phone_callback, "Fake Call"),
-                buildNavItem(3, LucideIcons.contact, "Helpline"),
-              ],
-            ),
-          ),
         ],
       ),
     );

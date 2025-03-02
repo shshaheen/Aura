@@ -52,6 +52,9 @@ dependencies:
   url_launcher: ^6.3.1
   flutter_map_cancellable_tile_provider: ^3.1.0
   google_fonts: ^6.2.1
+  flutter_callkit_incoming: ^2.5.0
+  audioplayers: ^6.2.0
+  flutter_ringtone_player: ^4.0.0+4
   
 
 dev_dependencies:
