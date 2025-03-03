@@ -55,6 +55,7 @@ dependencies:
   flutter_callkit_incoming: ^2.5.0
   audioplayers: ^6.2.0
   flutter_ringtone_player: ^4.0.0+4
+  provider: ^6.1.2
   
 
 dev_dependencies:
@@ -88,7 +89,7 @@ flutter:
     - assets/images/about1.png
     - assets/images/about3.png
     - assets/images/niya.jpg
-
+    - assets/sounds/ringtone.mp3
 
   #   - images/a_dot_ham.jpeg
 

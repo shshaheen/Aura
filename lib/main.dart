@@ -7,7 +7,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:aura/screens/welcome_screen.dart';
 import 'package:aura/screens/profile_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:aura/screens/Tabs/fake-call_setup/providers/fake_call_provider.dart';
+import 'package:provider/provider.dart';
 var kLightColorScheme = ColorScheme.fromSeed(
   seedColor: const Color.fromARGB(255, 0, 194, 203),
 );
@@ -23,7 +24,14 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => FakeCallProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

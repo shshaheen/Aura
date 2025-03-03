@@ -1,6 +1,3 @@
-import 'package:aura/screens/Tabs/fake_call_setup/fake_call_screen.dart';
-import 'package:aura/screens/Tabs/fake_call_setup/incoming_call_screen.dart';
-import 'package:aura/screens/Tabs/fake_call_setup/new_call.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -8,7 +5,9 @@ import 'package:aura/widgets/main_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aura/widgets/track_me.dart';
-import 'package:aura/screens/Tabs/fake_call_setup/widget/edit_caller_details.dart';
+import 'package:aura/screens/Tabs/fake-call_setup/screens/fake_call_screen.dart';
+import 'package:provider/provider.dart';
+import 'Tabs/fake-call_setup/providers/fake_call_provider.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -19,8 +18,8 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   Widget currentWidget = TrackMe();
+  int selectedIndex = 0; // Default screen index: TrackMe
   LatLng? _currentPosition;
-  int selectedIndex = 0; // Default to TrackMe
 
   @override
   void initState() {
@@ -51,6 +50,8 @@ class _HomepageState extends State<Homepage> {
   }
 
   void _onNavItemSelected(int index) {
+    if (selectedIndex == index) return; // Prevent unnecessary rebuilds
+
     setState(() {
       selectedIndex = index;
       switch (index) {
@@ -58,23 +59,13 @@ class _HomepageState extends State<Homepage> {
           currentWidget = TrackMe();
           break;
         case 1:
-          print("Navigate to Friends");
+          print("Navigate to Friends"); // Replace with actual screen
           break;
         case 2:
-          currentWidget = FakeCallScreen(
-            callerDetailsWidget: CallerDetailsCard(
-              onEdit: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NewCallPage()), // Navigate to NewCallPage
-              );
-              },
-            ),
-          );
-          
+          currentWidget = FakeCallScreen(); // Load FakeCallScreen as a widget
           break;
         case 3:
-          print("Navigate to Helpline");
+          print("Navigate to Helpline"); // Replace with actual screen
           break;
       }
     });
@@ -82,11 +73,10 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if keyboard is open
     bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Prevents overflow
+      resizeToAvoidBottomInset: true,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Container(
@@ -138,9 +128,8 @@ class _HomepageState extends State<Homepage> {
       body: Column(
         children: [
           const SizedBox(height: 3),
-          Expanded(child: currentWidget), // Now updates dynamically
+          Expanded(child: currentWidget), // Update dynamically based on selected index
 
-          // Show Bottom Navigation only if keyboard is NOT open
           if (!isKeyboardOpen)
             Container(
               padding: const EdgeInsets.all(7),
@@ -156,27 +145,7 @@ class _HomepageState extends State<Homepage> {
                 children: [
                   buildNavItem(0, Icons.location_on, "Track Me"),
                   buildNavItem(1, LucideIcons.users, "Friends"),
-                  Container(
-                    width: 75,
-                    height: 75,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.red.withOpacity(0.5),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        // Handle SOS button click
-                      },
-                      icon: Icon(Icons.sos, color: Colors.white),
-                    ),
-                  ),
+                  buildSOSButton(),
                   buildNavItem(2, Icons.phone_callback, "Fake Call"),
                   buildNavItem(3, LucideIcons.contact, "Helpline"),
                 ],
@@ -216,6 +185,30 @@ class _HomepageState extends State<Homepage> {
                     : Theme.of(context).colorScheme.secondary),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildSOSButton() {
+    return Container(
+      width: 75,
+      height: 75,
+      decoration: BoxDecoration(
+        color: Colors.red,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.5),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: IconButton(
+        onPressed: () {
+          print("SOS Button Pressed!");
+        },
+        icon: Icon(Icons.sos, color: Colors.white),
       ),
     );
   }
