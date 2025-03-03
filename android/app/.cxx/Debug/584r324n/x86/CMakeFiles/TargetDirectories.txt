@@ -1,0 +1,2 @@
+C:/Users/ssana/Documents/Flutter_Projects/Aura/android/app/.cxx/Debug/584r324n/x86/CMakeFiles/edit_cache.dir
+C:/Users/ssana/Documents/Flutter_Projects/Aura/android/app/.cxx/Debug/584r324n/x86/CMakeFiles/rebuild_cache.dir
