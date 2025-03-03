@@ -16,7 +16,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget iconstate = Icon(
     Icons.sentiment_satisfied,
     size: 50,
-    color: Colors.pink,
+    color: Colors.grey,
   );
   double _sliderValue = 0;
   TextEditingController _feedbackController = TextEditingController();
@@ -36,7 +36,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       _emailController.clear();
       setState(() {
         _sliderValue = 0; // Reset slider
-        iconstate = Icon(Icons.sentiment_satisfied, size: 50, color: Colors.pink);
+        iconstate = Icon(Icons.sentiment_satisfied, size: 50, color:Theme.of(context).colorScheme.primary);
       });
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +50,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Feedback"),
-        backgroundColor: Colors.purple[900],
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -74,26 +74,26 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       min: 0,
                       max: 2,
                       divisions: 2,
-                      activeColor: Colors.pink,
+                      activeColor:  Theme.of(context).colorScheme.secondary,
                       onChanged: (value) {
                         setState(() {
                           if (value == 0) {
                             iconstate = Icon(
                               Icons.sentiment_satisfied,
                               size: 50,
-                              color: Colors.pink,
+                              color: Theme.of(context).colorScheme.primary,
                             );
                           } else if (value == 1) {
                             iconstate = Icon(
                               Icons.sentiment_dissatisfied,
                               size: 50,
-                              color: Colors.pink,
+                              color: Theme.of(context).colorScheme.primary,
                             );
                           } else {
                             iconstate = Icon(
                               Icons.sentiment_neutral,
                               size: 50,
-                              color: Colors.pink,
+                              color: Theme.of(context).colorScheme.primary,
                             );
                           }
                           _sliderValue = value;
@@ -103,9 +103,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text("Happy", style: TextStyle(color: Colors.pink)),
-                        Text("Unhappy"),
-                        Text("Confused"),
+                        Text("Happy", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                        Text("Unhappy", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                        Text("Confused", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                       ],
                     ),
                   ],
@@ -136,7 +136,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple[900],
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
