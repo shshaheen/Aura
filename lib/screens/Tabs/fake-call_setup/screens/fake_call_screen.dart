@@ -23,7 +23,7 @@ class FakeCallScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).secondaryHeaderColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 4)],
             ),
@@ -41,7 +41,11 @@ class FakeCallScreen extends StatelessWidget {
                           fakeCallProvider.callerName == "Set caller details"
                               ? "Caller Details"
                               : fakeCallProvider.callerName,
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 18, 
+                            fontWeight: FontWeight.bold, 
+                            // color: Theme.of(context).colorScheme.onSecondaryContainer
+                            ),
                         ),
                         if (fakeCallProvider.phoneNumber.isNotEmpty)
                           Text(fakeCallProvider.phoneNumber),
@@ -86,7 +90,7 @@ class FakeCallScreen extends StatelessWidget {
                       });
                     }
                   : null,
-              child: Text("Start Fake Call", style: TextStyle(fontSize: 16)),
+              child: Text("Schedule Call", style: TextStyle(fontSize: 16)),
             ),
           ),
         ],

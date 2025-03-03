@@ -1,3 +1,5 @@
+import 'package:aura/screens/Tabs/helpline/helpline_details_screen.dart';
+import 'package:aura/screens/Tabs/helpline/helpline_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -6,8 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aura/widgets/track_me.dart';
 import 'package:aura/screens/Tabs/fake-call_setup/screens/fake_call_screen.dart';
-import 'package:provider/provider.dart';
-import 'Tabs/fake-call_setup/providers/fake_call_provider.dart';
+// import 'package:provider/provider.dart';
+// import 'Tabs/fake-call_setup/providers/fake_call_provider.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -65,6 +67,7 @@ class _HomepageState extends State<Homepage> {
           currentWidget = FakeCallScreen(); // Load FakeCallScreen as a widget
           break;
         case 3:
+          currentWidget = HelplineScreen();
           print("Navigate to Helpline"); // Replace with actual screen
           break;
       }
@@ -128,7 +131,9 @@ class _HomepageState extends State<Homepage> {
       body: Column(
         children: [
           const SizedBox(height: 3),
-          Expanded(child: currentWidget), // Update dynamically based on selected index
+          Expanded(
+              child:
+                  currentWidget), // Update dynamically based on selected index
 
           if (!isKeyboardOpen)
             Container(
