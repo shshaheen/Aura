@@ -102,7 +102,7 @@ class _TrackMeState extends State<TrackMe> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12), // Rounded corners
               ),
-              color: Theme.of(context).secondaryHeaderColor, // Background color
+              color: Theme.of(context).colorScheme.onPrimary, // Background color
               child: Padding(
                 padding: EdgeInsets.all(16), // Adds space inside the card
                 child: Column(
