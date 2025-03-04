@@ -57,6 +57,7 @@ dependencies:
   flutter_ringtone_player: ^4.0.0+4
   provider: ^6.1.2
   google_generative_ai: ^0.4.6
+  flutter_spinkit: ^5.2.1
 
 dev_dependencies:
   flutter_test:
