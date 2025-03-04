@@ -6,8 +6,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:aura/widgets/main_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:aura/widgets/track_me.dart';
+import 'package:aura/screens/Tabs/track_me.dart';
 import 'package:aura/screens/Tabs/fake-call_setup/screens/fake_call_screen.dart';
+import 'chat_screen.dart';
+
 // import 'package:provider/provider.dart';
 // import 'Tabs/fake-call_setup/providers/fake_call_provider.dart';
 
@@ -109,6 +111,9 @@ class _HomepageState extends State<Homepage> {
             actions: [
               InkWell(
                 onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ChatScreen()));
+                  ChatScreen();
                   // Handle profile tap
                 },
                 child: Padding(
