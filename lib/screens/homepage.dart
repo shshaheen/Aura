@@ -9,7 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aura/screens/Tabs/track_me.dart';
 import 'package:aura/screens/Tabs/fake-call_setup/screens/fake_call_screen.dart';
 import 'chat_screen.dart';
-
+import 'Tabs/Friends/friends_page.dart';
 // import 'package:provider/provider.dart';
 // import 'Tabs/fake-call_setup/providers/fake_call_provider.dart';
 
@@ -63,6 +63,7 @@ class _HomepageState extends State<Homepage> {
           currentWidget = TrackMe();
           break;
         case 1:
+          currentWidget = FriendsPage();
           print("Navigate to Friends"); // Replace with actual screen
           break;
         case 2:
