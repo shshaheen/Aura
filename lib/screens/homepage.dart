@@ -1,5 +1,7 @@
 import 'package:aura/screens/Tabs/helpline/helpline_details_screen.dart';
 import 'package:aura/screens/Tabs/helpline/helpline_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -10,6 +12,10 @@ import 'package:aura/screens/Tabs/track_me.dart';
 import 'package:aura/screens/Tabs/fake-call_setup/screens/fake_call_screen.dart';
 import 'chat_screen.dart';
 import 'Tabs/Friends/friends_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:twilio_flutter/twilio_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:provider/provider.dart';
 // import 'Tabs/fake-call_setup/providers/fake_call_provider.dart';
 
@@ -24,11 +30,111 @@ class _HomepageState extends State<Homepage> {
   Widget currentWidget = TrackMe();
   int selectedIndex = 0; // Default screen index: TrackMe
   LatLng? _currentPosition;
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  
+  final TwilioFlutter twilioFlutter = TwilioFlutter(
+    accountSid: dotenv.env['ACCOUNT_SID_new'] ?? '',  // Replace with Twilio Account SID
+    authToken:dotenv.env['AUTH_TOKEN_new'] ?? '' ,   // Replace with Twilio Auth Token
+    twilioNumber: dotenv.env['TWILIO_phone_new'] ?? '', // Replace with Twilio Number
+  );
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+    _setupFirebaseMessaging();
+  }
+
+  void _setupFirebaseMessaging() async {
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print("User granted permission for notifications.");
+    }
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("New foreground message: ${message.notification?.title}");
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("Notification clicked: ${message.notification?.body}");
+    });
+  }
+
+  // Fetch Contacts and Send Push Notification
+  // Future<void> getContactsAndSendLocation() async {
+  //   var snapshot = await FirebaseFirestore.instance.collection("contacts").get();
+  //   List<Map<String, dynamic>> contacts = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  //   String locationUrl = getLocationUrl(_currentPosition);
+
+  //   for (Map<String, dynamic> contact in contacts) {
+  //     String token = contact['phone'];  // Assuming users store FCM tokens
+  //     sendPushNotification(token, "Emergency Alert!", locationUrl);
+  //   }
+  // }
+  Future<void> sendSmsToAllContacts() async {
+  String msg = getLocationUrl(_currentPosition);
+
+  if (msg.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please enter a message")),
+    );
+    return;
+  }
+
+  try {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('contacts').get();
+
+    for (var doc in querySnapshot.docs) {
+      String phoneNumber = doc['phone'];
+      print("Sending SMS to: $phoneNumber");
+
+      var response = await twilioFlutter.sendSMS(
+        toNumber: phoneNumber,
+        messageBody: msg,
+      );
+
+      print("Twilio Response: $response"); // 🔥 Print Twilio's response
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("SMS sent to all contacts!")),
+    );
+  } catch (e) {
+    print("Error sending SMS: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error sending SMS: $e")),
+    );
+  }
+}
+
+  // Send Push Notification
+  Future<void> sendPushNotification(String token, String title, String body) async {
+    try {
+      await FirebaseFirestore.instance.collection("notifications").add({
+        "token": token,
+        "title": title,
+        "body": body,
+        "timestamp": FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print("Error sending notification: $e");
+    }
+  }
+
+  // Get Google Maps URL
+  String getLocationUrl(LatLng? position) {
+    if (position == null) {
+      print("Location not available!");
+      return "Location not available!";
+    }
+    String url = "https://www.google.com/maps?q=${position.latitude},${position.longitude}";
+    return url;
   }
 
   Future<void> _getCurrentLocation() async {
@@ -217,6 +323,9 @@ class _HomepageState extends State<Homepage> {
       ),
       child: IconButton(
         onPressed: () {
+          sendSmsToAllContacts();
+          // getContacts();
+          // getLocationUrl(_currentPosition);
           print("SOS Button Pressed!");
         },
         icon: Icon(Icons.sos, color: Colors.white),

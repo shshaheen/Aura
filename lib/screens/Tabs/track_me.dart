@@ -19,44 +19,39 @@ class _TrackMeState extends State<TrackMe> {
     super.initState();
     _getCurrentLocation();
   }
+Future<void> _getCurrentLocation() async {
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Location services are disabled!'), backgroundColor: Colors.red),
+    );
+    return;
+  }
 
-  Future<void> _getCurrentLocation() async {
-    setState(() {
-      _errorMessage = null; // Reset error message
-    });
-
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() {
-        _errorMessage = "Location services are disabled.";
-      });
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location permission denied! Please enable it from settings.'), backgroundColor: Colors.red),
+      );
       return;
     }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
-        setState(() {
-          _errorMessage = "Location permission is permanently denied.";
-        });
-        return;
-      }
-    }
-
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
-      );
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = "Error fetching location: $e";
-      });
-    }
   }
+
+  try {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.best,
+    );
+    if (!mounted) return;
+
+    setState(() {
+      _currentPosition = LatLng(position.latitude, position.longitude);
+    });
+  } catch (e) {
+    print("Error fetching location: $e");
+  }
+}
 
   @override
   Widget build(BuildContext context) {
