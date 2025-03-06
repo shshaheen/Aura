@@ -77,11 +77,31 @@ class _HomepageState extends State<Homepage> {
   //   }
   // }
   Future<void> sendSmsToAllContacts() async {
-  String msg = getLocationUrl(_currentPosition);
+  // Fetch user details
+  DocumentSnapshot doc = await FirebaseFirestore.instance
+      .collection("users")
+      .doc('ekRVTlmItAeLByd0OvkJItotNaZ2') // Replace with actual document ID
+      .get();
+
+  String name = '';
+  if (doc.exists && doc.data() != null) {
+    name = doc['name'] ?? 'Unknown'; // Ensure name is valid
+  } else {
+    print("User document not found.");
+  }
+
+  // Get location
+  String location = getLocationUrl(_currentPosition);
+
+  // Construct the message safely
+  String helperText = "\n\n $name is in danger.\n Needs help!";
+  String msg = "$helperText\nLocation: $location";
+
+  print("SMS Message: $msg"); // Debugging
 
   if (msg.trim().isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please enter a message")),
+      SnackBar(content: Text("Message cannot be empty")),
     );
     return;
   }
@@ -92,6 +112,14 @@ class _HomepageState extends State<Homepage> {
 
     for (var doc in querySnapshot.docs) {
       String phoneNumber = doc['phone'];
+
+      if (phoneNumber.isEmpty) continue; // Skip empty numbers
+
+      // 🔹 **Check Message Length and Split if Necessary**
+      if (msg.length > 160) {
+        msg = msg.substring(0, 160); // Trim to fit in one SMS
+      }
+
       print("Sending SMS to: $phoneNumber");
 
       var response = await twilioFlutter.sendSMS(
@@ -99,7 +127,7 @@ class _HomepageState extends State<Homepage> {
         messageBody: msg,
       );
 
-      print("Twilio Response: $response"); // 🔥 Print Twilio's response
+      print("Twilio Response: $response"); // 🔥 Debugging Twilio Response
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -112,6 +140,7 @@ class _HomepageState extends State<Homepage> {
     );
   }
 }
+
 
   // Send Push Notification
   Future<void> sendPushNotification(String token, String title, String body) async {
