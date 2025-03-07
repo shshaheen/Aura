@@ -3,6 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 
 class TrackMe extends StatefulWidget {
   const TrackMe({super.key});
@@ -53,26 +55,35 @@ class _TrackMeState extends State<TrackMe> {
     }
   }
 
-  Future<void> _shareLocation() async {
-    if (_currentPosition == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Fetching location, please wait...")),
-      );
-      return;
-    }
-
-    String googleMapsUrl =
-        "https://www.google.com/maps?q=${_currentPosition!.latitude},${_currentPosition!.longitude}";
-
-    final Uri shareUri = Uri.parse("sms:?body=My live location: $googleMapsUrl");
-    if (await canLaunchUrl(shareUri)) {
-      await launchUrl(shareUri);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Could not launch sharing options")),
-      );
-    }
+Future<void> _shareLocation() async {
+  if (_currentPosition == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Fetching location, please wait...")),
+    );
+    return;
   }
+
+  String googleMapsUrl =
+      "https://www.google.com/maps?q=${_currentPosition!.latitude},${_currentPosition!.longitude}";
+  String message = "My live location: $googleMapsUrl";
+
+  final intent = AndroidIntent(
+    action: "android.intent.action.SEND",
+    package: "com.whatsapp",
+    type: "text/plain",
+    arguments: {"android.intent.extra.TEXT": message},
+    flags: [Flag.FLAG_ACTIVITY_NEW_TASK],
+  );
+
+  try {
+    await intent.launch();
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("WhatsApp is not installed")),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
