@@ -77,6 +77,31 @@ class _HomepageState extends State<Homepage> {
   //   }
   // }
   Future<void> sendSmsToAllContacts() async {
+  // Show confirmation dialog
+  bool? confirm = await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Confirm SOS"),
+        content: Text("Are you sure you want to share your live location with your trusted contacts?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // User clicked "No"
+            child: Text("No", style: TextStyle(color: Colors.red)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // User clicked "Yes"
+            child: Text("Yes", style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (confirm == null || !confirm) {
+    return; // Exit if user cancels
+  }
+
   // Fetch user details
   DocumentSnapshot doc = await FirebaseFirestore.instance
       .collection("users")
@@ -85,7 +110,7 @@ class _HomepageState extends State<Homepage> {
 
   String name = '';
   if (doc.exists && doc.data() != null) {
-    name = doc['name'] ?? 'Unknown'; // Ensure name is valid
+    name = doc['name'] ?? 'Unknown';
   } else {
     print("User document not found.");
   }
@@ -94,14 +119,17 @@ class _HomepageState extends State<Homepage> {
   String location = getLocationUrl(_currentPosition);
 
   // Construct the message safely
-  String helperText = "\n\n $name is in danger.\n Needs help!";
+  String helperText = "\n\n$name is in danger.\nNeeds help!";
   String msg = "$helperText\nLocation: $location";
 
   print("SMS Message: $msg"); // Debugging
 
   if (msg.trim().isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Message cannot be empty")),
+      SnackBar(
+        content: Text("Message cannot be empty"),
+        backgroundColor: Colors.red,
+      ),
     );
     return;
   }
@@ -113,11 +141,11 @@ class _HomepageState extends State<Homepage> {
     for (var doc in querySnapshot.docs) {
       String phoneNumber = doc['phone'];
 
-      if (phoneNumber.isEmpty) continue; // Skip empty numbers
+      if (phoneNumber.isEmpty) continue;
 
-      // 🔹 **Check Message Length and Split if Necessary**
+      // Ensure SMS fits within one message
       if (msg.length > 160) {
-        msg = msg.substring(0, 160); // Trim to fit in one SMS
+        msg = msg.substring(0, 160);
       }
 
       print("Sending SMS to: $phoneNumber");
@@ -127,16 +155,22 @@ class _HomepageState extends State<Homepage> {
         messageBody: msg,
       );
 
-      print("Twilio Response: $response"); // 🔥 Debugging Twilio Response
+      print("Twilio Response: $response");
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("SMS sent to all contacts!")),
+      SnackBar(
+        content: Text("SMS sent to all contacts!"),
+        backgroundColor: Colors.green, // Green color for success
+      ),
     );
   } catch (e) {
     print("Error sending SMS: $e");
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error sending SMS: $e")),
+      SnackBar(
+        content: Text("Error sending SMS: $e"),
+        backgroundColor: Colors.red, // Red color for failure
+      ),
     );
   }
 }
