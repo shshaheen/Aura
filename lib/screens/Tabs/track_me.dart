@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TrackMe extends StatefulWidget {
   const TrackMe({super.key});
@@ -19,39 +20,59 @@ class _TrackMeState extends State<TrackMe> {
     super.initState();
     _getCurrentLocation();
   }
-Future<void> _getCurrentLocation() async {
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Location services are disabled!'), backgroundColor: Colors.red),
-    );
-    return;
-  }
 
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Location permission denied! Please enable it from settings.'), backgroundColor: Colors.red),
-      );
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() => _errorMessage = 'Location services are disabled!');
       return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() => _errorMessage =
+            'Location permission denied! Please enable it from settings.');
+        return;
+      }
+    }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _currentPosition = LatLng(position.latitude, position.longitude);
+        _errorMessage = null;
+      });
+    } catch (e) {
+      setState(() => _errorMessage = "Error fetching location: $e");
     }
   }
 
-  try {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
-    );
-    if (!mounted) return;
+  Future<void> _shareLocation() async {
+    if (_currentPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Fetching location, please wait...")),
+      );
+      return;
+    }
 
-    setState(() {
-      _currentPosition = LatLng(position.latitude, position.longitude);
-    });
-  } catch (e) {
-    print("Error fetching location: $e");
+    String googleMapsUrl =
+        "https://www.google.com/maps?q=${_currentPosition!.latitude},${_currentPosition!.longitude}";
+
+    final Uri shareUri = Uri.parse("sms:?body=My live location: $googleMapsUrl");
+    if (await canLaunchUrl(shareUri)) {
+      await launchUrl(shareUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Could not launch sharing options")),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +82,9 @@ Future<void> _getCurrentLocation() async {
           /// **Map View**
           Positioned.fill(
             child: _errorMessage != null
-                ? Center(child: Text(_errorMessage!, style: TextStyle(color: Colors.red)))
+                ? Center(
+                    child: Text(_errorMessage!,
+                        style: TextStyle(color: Colors.red)))
                 : _currentPosition == null
                     ? Center(child: CircularProgressIndicator())
                     : FlutterMap(
@@ -71,7 +94,8 @@ Future<void> _getCurrentLocation() async {
                         ),
                         children: [
                           TileLayer(
-                            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                            urlTemplate:
+                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                             subdomains: ['a', 'b', 'c'],
                             userAgentPackageName: 'com.example.yourapp',
                           ),
@@ -81,7 +105,8 @@ Future<void> _getCurrentLocation() async {
                                 point: _currentPosition!,
                                 width: 40,
                                 height: 40,
-                                child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                                child: Icon(Icons.location_pin,
+                                    color: Colors.red, size: 40),
                               ),
                             ],
                           ),
@@ -93,21 +118,22 @@ Future<void> _getCurrentLocation() async {
             left: 3,
             right: 3,
             child: Card(
-              elevation: 4, // Adds a shadow for a floating effect
+              elevation: 4,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12), // Rounded corners
+                borderRadius: BorderRadius.circular(12),
               ),
-              color: Theme.of(context).colorScheme.onPrimary, // Background color
+              color: Theme.of(context).colorScheme.onPrimary,
               child: Padding(
-                padding: EdgeInsets.all(16), // Adds space inside the card
+                padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Track me",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 4), // Space between title & subtitle
+                    SizedBox(height: 4),
                     Text(
                       "Share live location with your friends",
                       style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -117,7 +143,6 @@ Future<void> _getCurrentLocation() async {
               ),
             ),
           ),
-
 
           /// **Location Button (Top Right)**
           Positioned(
@@ -145,11 +170,11 @@ Future<void> _getCurrentLocation() async {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              onPressed: _getCurrentLocation,
-              child: Text("Track Me", style: TextStyle(fontSize: 16, color: Colors.white)),
+              onPressed: _shareLocation,
+              child: Text("Track Me",
+                  style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ),
-          
         ],
       ),
     );
