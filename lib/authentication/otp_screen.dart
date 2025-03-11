@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'package:uuid/uuid.dart';
+
 // import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'twilio_service.dart';
 import 'package:aura/main.dart';
@@ -80,32 +83,40 @@ class OTPScreenState extends State<OTPScreen>
     setState(() => isLoading = false);
   }
 
-  void verifyOTP() async {
+ void verifyOTP() async {
+  var uuid = Uuid();
+  setState(() {
+    isLoading = true;
+    errorMessage = "";
+  });
+
+  String phoneNumber = "+91${phoneController.text.trim()}";
+  String otp = otpController.text.trim();
+  if (otp.isEmpty || otp.length != 6) {
     setState(() {
-      isLoading = true;
-      errorMessage = "";
+      errorMessage = "Enter a valid 6-digit OTP";
+      isLoading = false;
     });
-
-    String phoneNumber = "+91${phoneController.text.trim()}";
-    String otp = otpController.text.trim();
-    if (otp.isEmpty || otp.length != 6) {
-      setState(() {
-        errorMessage = "Enter a valid 6-digit OTP";
-        isLoading = false;
-      });
-      return;
-    }
-
-    bool success = await TwilioService.verifyOTP(phoneNumber, otp, context);
-    if (success) {
-      otpTimer?.cancel();
-      showSnackBar("OTP Verified Successfully!", Colors.green);
-    } else {
-      setState(() => errorMessage = "Invalid OTP. Try again!");
-    }
-
-    setState(() => isLoading = false);
+    return;
   }
+
+  bool success = await TwilioService.verifyOTP(phoneNumber, otp, context);
+  if (success) {
+    otpTimer?.cancel();
+    showSnackBar("OTP Verified Successfully!", Colors.green);
+
+    // Save phone number to Firestore
+    await FirebaseFirestore.instance.collection('users').doc(phoneNumber).set({
+      'phone': phoneNumber,
+      'createdAt': FieldValue.serverTimestamp(),
+      'userId' : uuid.v4()  // Timestamp for tracking
+    }, SetOptions(merge: true)); // Merge in case user already exists
+  } else {
+    setState(() => errorMessage = "Invalid OTP. Try again!");
+  }
+
+  setState(() => isLoading = false);
+}
 
   void resetForm() {
     setState(() {
@@ -146,7 +157,7 @@ class OTPScreenState extends State<OTPScreen>
             end: Alignment.bottomCenter,
           ),
         ),
-        padding: const EdgeInsets.all(28.0),
+        padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Container(
             // decoration: BoxDecoration(
@@ -165,10 +176,11 @@ class OTPScreenState extends State<OTPScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "OTP Authentication",
+                      "Phone Authentication",
                       style: textTheme.headlineSmall?.copyWith( 
                           fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimary),
+                          color: colorScheme.onPrimary,
+                          fontSize: 20),
                     ),
                     SizedBox(height: 15),
                   
@@ -178,7 +190,7 @@ class OTPScreenState extends State<OTPScreen>
                       style: TextStyle(color: colorScheme.onPrimary),
                       cursorColor: colorScheme.onPrimary, 
                       decoration: InputDecoration(
-                        labelText: "Phone Number",
+                        labelText: "Enter mobile number",
                         labelStyle: TextStyle(color: colorScheme.onPrimary),
                         prefixText: "+91 ",
                         prefixStyle: TextStyle(color: colorScheme.onPrimary), 

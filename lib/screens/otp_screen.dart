@@ -46,7 +46,7 @@ class OTPScreenState extends State<OTPScreen> {
         // Check if user has completed profile (you can modify this logic)
         bool hasCompletedProfile =
             false; // Change this logic as per your database
-
+        
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

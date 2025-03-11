@@ -1,3 +1,4 @@
+import 'package:aura/screens/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -24,26 +25,43 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   void submitFeedback() {
     FirebaseFirestore.instance.collection("feedback").add({
-      "iconState": _sliderValue == 0 ? "Happy" : _sliderValue == 1 ? "Unhappy" : "Confused",
+      "iconState": _sliderValue == 0
+          ? "Happy"
+          : _sliderValue == 1
+              ? "Unhappy"
+              : "Confused",
       "feedback": _feedbackController.text,
       "email": _emailController.text,
       "timestamp": FieldValue.serverTimestamp(),
     }).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Feedback submitted successfully!")),
+        SnackBar(content: Text("Thank you for your feedback❤️",
+        ), backgroundColor: Colors.green,),
+        
+        
       );
+      Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Homepage()),
+        (route) => false, // Clears previous routes from stack
+      );
+    });
       _feedbackController.clear();
       _emailController.clear();
       setState(() {
         _sliderValue = 0; // Reset slider
-        iconstate = Icon(Icons.sentiment_satisfied, size: 50, color:Theme.of(context).colorScheme.primary);
+        iconstate = Icon(Icons.sentiment_satisfied,
+            size: 50, color: Theme.of(context).colorScheme.primary);
       });
+     
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $error")),
       );
     });
-}
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +92,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       min: 0,
                       max: 2,
                       divisions: 2,
-                      activeColor:  Theme.of(context).colorScheme.secondary,
+                      activeColor: Theme.of(context).colorScheme.secondary,
                       onChanged: (value) {
                         setState(() {
                           if (value == 0) {
@@ -103,9 +121,15 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text("Happy", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                        Text("Unhappy", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                        Text("Confused", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                        Text("Happy",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary)),
+                        Text("Unhappy",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary)),
+                        Text("Confused",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary)),
                       ],
                     ),
                   ],
@@ -143,15 +167,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   ),
                   onPressed: () {
-                  if (_emailController.text.isNotEmpty && _feedbackController.text.isNotEmpty) {
-                    submitFeedback();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Please enter feedback and email!")),
-                    );
-                  }
-                },
-
+                    if (_emailController.text.isNotEmpty &&
+                        _feedbackController.text.isNotEmpty) {
+                      submitFeedback();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text("Please enter feedback and email!")),
+                      );
+                    }
+                  },
                   child: Text("Send", style: TextStyle(color: Colors.white)),
                 ),
               ),

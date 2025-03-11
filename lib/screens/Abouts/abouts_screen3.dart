@@ -1,3 +1,5 @@
+import 'package:aura/authentication/otp_screen.dart';
+
 import '../phone_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aura/main.dart'; // Import to access kLightColorScheme and kDarkColorScheme

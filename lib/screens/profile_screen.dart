@@ -109,12 +109,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
 
     String? userId = _auth.currentUser?.uid;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not authenticated"), backgroundColor: Colors.red),
-      );
-      return;
-    }
+    // if (userId == null) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text("User not authenticated"), backgroundColor: Colors.red),
+    //   );
+    //   return;
+    // }
 
     try {
       await _firestore.collection("users").doc(userId).set({
