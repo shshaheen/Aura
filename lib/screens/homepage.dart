@@ -283,7 +283,7 @@ class _HomepageState extends State<Homepage> {
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ChatScreen()));
-                  ChatScreen();
+                  // ChatScreen();
                   // Handle profile tap
                 },
                 child: Padding(

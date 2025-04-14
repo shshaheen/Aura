@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:uuid/uuid.dart';
-
-// import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'twilio_service.dart';
@@ -265,8 +263,7 @@ class OTPScreenState extends State<OTPScreen>
                     isLoading
                         ? CircularProgressIndicator(color: Colors.blueAccent)
                         : ElevatedButton(
-                            onPressed: otpSent ? verifyOTP : sendOTP,
-                            child: Text(otpSent ? "Verify OTP" : "Send OTP"),
+                            onPressed: otpSent ? verifyOTP : sendOTP,                            
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.onSecondary,
                               foregroundColor: colorScheme.onSecondaryContainer,
@@ -275,6 +272,7 @@ class OTPScreenState extends State<OTPScreen>
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
                             ),
+                            child: Text(otpSent ? "Verify OTP" : "Send OTP"),
                           ),
                     SizedBox(height: 10),
                   

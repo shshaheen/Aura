@@ -9,6 +9,7 @@ import 'package:aura/screens/profile_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:aura/screens/Tabs/fake-call_setup/providers/fake_call_provider.dart';
 import 'package:provider/provider.dart';
+
 var kLightColorScheme = ColorScheme.fromSeed(
   seedColor: const Color.fromARGB(255, 0, 194, 203),
 );
